@@ -3,13 +3,21 @@ var Player = function(initX,initY,WIDTH,HEIGHT,strokeStyle,fillStyle,maxSpeed){
     this.height = HEIGHT;
     this.strokeStyle = strokeStyle;
     this.fillStyle = fillStyle;
-
+    this.health = 6;
     this.movable = new Movable(initX,initY,maxSpeed);
+    this.alive = true;
 }
 
 Player.prototype.update = function(dt){
     this.move(dt);
     this.draw();
+}
+
+Player.prototype.takeDamage = function(damage){
+    this.health -= damage;
+    if (health <= 0) {
+        this.alive = false;
+    }
 }
 
 Player.prototype.move = function(dt){

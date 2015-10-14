@@ -12,7 +12,8 @@ var KeyCode = Object.freeze({
 	Down:40,
 	Right:39,
 	Shift:16,
-	P:80
+	P:80,
+	G:71
 	});
 
 
@@ -36,6 +37,13 @@ addEventListener("keyup", function (e)
 	}
 
 }, false);
+
+function keyUpdate(){
+	oldKeys = {};
+	for (var property in keys) {
+		oldKeys[property] = keys[property];
+	}
+}
 
 addEventListener("mousedown",function(e) {
 	/*if(gamePaused) {

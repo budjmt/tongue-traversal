@@ -2,6 +2,7 @@ var canvas, ctx;
 var lastFrame, dt;
 
 var tongue;
+var hud;
 
 window.onload = function() {
 	canvas = document.querySelector("canvas");
@@ -11,7 +12,7 @@ window.onload = function() {
 	
 	tongue = new Tongue();
 	//player = new Player(20,canvas.height-20,20,20,"black","red",1000000000000);
-	
+	hud = new HUD("black","black");
 	update();
 }
 
@@ -32,15 +33,23 @@ function update() {
 	//player.update(dt,ctx);
 	tongue.update(dt);
 	
-	ctx.clearRect(0,0,canvas.width,canvas.height);
+	//ctx.clearRect(0,0,canvas.width,canvas.height);
+	
+	hud.update();
+	keyUpdate();
 	
 	//player code
-	/*ctx.save();
-	ctx.fillStyle = "black";
+	ctx.save();
+	var gradient = ctx.createLinearGradient(0,0,0,canvas.height);
+    gradient.addColorStop(0,"rgb(240,240,240)");
+    gradient.addColorStop(1,"rgb(210,210,210)");
+    ctx.fillStyle = gradient;
 	ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
-	ctx.restore();*/
+	ctx.restore();
 	//tongue code
 	tongue.draw(ctx);
+	hud.draw();
+	
 }
 
 //helper functions
