@@ -23,25 +23,29 @@ addEventListener("keyup", function (e)
 }, false);
 
 addEventListener("mousedown",function(e) {
-	if(gamePaused) {
+	/*if(gamePaused) {
 		resumeGame();
 		return;
-	}
-	if(player.canShoot){
-		player.fireBullet();
+	}*/
+	if(tongue.canExtend){
+		var mouse = new Vector(0, 0);
+		mouse.x = e.pageX - e.target.offsetLeft;
+		mouse.y = e.pageY - e.target.offsetTop;
+		tongue.extending = true;
+		tongue.currSegment = new Segment(tongue.movable.pos.x,tongue.movable.pos.y,1);
+		tongue.currSegment.end = mouse;
 	}
 });
 
 addEventListener("mousemove",function(e) {
 	var mouse = new Vector(0, 0);
-	var delta = new Vector(0, 0);
 	mouse.x = e.pageX - e.target.offsetLeft;
 	mouse.y = e.pageY - e.target.offsetTop;
-	delta.x = mouse.x - worldToScreen(player.movable.pos.x,camX,ctx.canvas.width);
-	//delta.x = player.facing*Math.abs(delta.x);
-	delta.y = mouse.y - worldToScreen(player.movable.pos.y-35,camY,ctx.canvas.height);
-	//console.log(mouse.x + "," + mouse.y + "; " + player.movable.px + "," + player.movable.py);
-	player.gunDir = delta;
+	//console.log(mouse.x + ',' + mouse.y);
+	if(tongue.extending && tongue.canExtend) {
+		tongue.currSegment.end = lerpVector(tongue.currSegment.end,mouse,0.8);
+		tongue.mouse = mouse;
+	}
 });
 
 function input()

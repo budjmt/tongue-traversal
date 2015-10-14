@@ -60,6 +60,11 @@ Vector.prototype.dot = function(otherVec)
 	return this.x * otherVec.x + this.y * otherVec.y;
 }
 
+//random static function ftw
+var lerpVector = function(a,b,t) {
+	return a.mult(1 - t).add(b.mult(t));
+}
+
 Vector.prototype.copy = function()
 {
 	return new Vector(this.x, this.y);
