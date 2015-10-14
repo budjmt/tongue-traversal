@@ -1,6 +1,21 @@
 //  Keyboard input
 var keys = {};
 var oldKeys = {};
+
+var KeyCode = Object.freeze({
+	W:87,
+	A:65,
+	S:83,
+	D:68,
+	Up:38,
+	Left:37,
+	Down:40,
+	Right:39,
+	Shift:16,
+	P:80
+	});
+
+
 addEventListener("keydown", function (e) 
 {
 	//...why are we doing it this way???
@@ -56,7 +71,7 @@ function input()
 		resetLevel();
 	}
 
-	if ( keys [87] && !oldKeys[87] ) {    //W
+	if ( keys [KeyCode.W] && !oldKeys[KeyCode.W] ) {    //W
 
 		for (var c =0 ; c < cover.length; c++) {
 			if(player.collider.intersects(cover[c].collider))
@@ -81,25 +96,25 @@ function input()
 		}
 	}
 
-	if ( keys [83] ) {    //S
+	if ( keys [KeyCode.S] ) {    //S
 		//console.log('S');
 		//Slide
 		player.movement = MOVEMENT.CROUCHING;
 	}
 	else {
 
-		if((keys[68] && keys[65]) || (!keys[68] && !keys[65]) )
+		if((keys[KeyCode.A] && keys[KeyCode.D]) || (!keys[KeyCode.A] && !keys[KeyCode.S]) )
 		{
 			//  Do nothing when pushing both diretions
 			player.movement = MOVEMENT.STANDING;
 		}
-		else if (keys[68] ) {   // D
+		else if (keys[KeyCode.D] ) {   // D
 			//console.log('D');
 			player.facing = FACING.RIGHT;
 			player.movement = MOVEMENT.WALKING;
 		}
 
-		else if ( keys[65] ) {    //Aa
+		else if ( keys[KeyCode.A] ) {    //Aa
 			//console.log('A');
 			player.facing = FACING.LEFT;
 			player.movement = MOVEMENT.WALKING;
@@ -117,11 +132,11 @@ function input()
 			}
 
 		}*/
-		if ( keys [16] ) {    //Shift
+		if ( keys [KeyCode.Shift] ) {    //Shift
 			//console.log('Shift');
 			//  Run
 		}
-		if ( keys [80] ) {    //p
+		if ( keys [KeyCode.P] ) {    //p
 			if(gamePaused){
 				gamePaused = false;
 				resumeGame();
