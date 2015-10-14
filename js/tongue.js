@@ -1,6 +1,6 @@
 var Segment = function(x,y,num) {
 	this.start = new Vector(x,y);
-	this.end = new Vector(0,0);
+	this.end = new Vector(x,y);
 	this.num = num;
 }
 
@@ -10,7 +10,7 @@ Segment.prototype.length = function() {
 
 Segment.prototype.retract = function() {
 	var slope = (this.end.y - this.start.y) / (this.end.x - this.start.x);
-	this.end = lerpVector(this.end,this.start,1 / this.num + 0.1);
+	this.end = lerpVector(this.end,this.start,0.5);
 }
 
 var Tongue = function() {
@@ -48,7 +48,7 @@ Tongue.prototype.update = function(dt) {
 			this.segments.push(this.currSegment);
 			this.numSegments++;
 			this.currSegment = new Segment(this.currSegment.end.x,this.currSegment.end.y
-											,this.segments.length + 1);
+											,this.numSegments + 1);
 			this.currSegment.end = this.mouse;
 			this.currTime = 0;
 		}
@@ -56,23 +56,26 @@ Tongue.prototype.update = function(dt) {
 			this.canExtend = false;
 			this.currTime = 0;
 		}
+		else {
+			this.currSegment.end = lerpVector(this.currSegment.end,this.mouse,0.5);
+		}
 	}
 }
 
 Tongue.prototype.draw = function(ctx) {
 	ctx.save();
 	var r = 150, g = 50, b = 50;
-	ctx.lineWidth = 50;
 	this.segments.forEach(function(element) { 
-		r += 10;
+		r += 10; g += 3; b += 3;
 		ctx.strokeStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+		ctx.lineWidth = Math.min(50, 50 / element.length() * 100);
 		ctx.beginPath();
 		ctx.moveTo(element.start.x,element.start.y);
 		ctx.lineTo(element.end.x,element.end.y);
 		ctx.stroke();
 	});
 	if(this.currSegment != null) {
-		r += 20;
+		r += 10; g += 3; b += 3;
 		ctx.strokeStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
 		ctx.beginPath();
 		ctx.moveTo(this.currSegment.start.x,this.currSegment.start.y);

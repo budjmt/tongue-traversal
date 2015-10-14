@@ -42,13 +42,15 @@ addEventListener("mousedown",function(e) {
 		resumeGame();
 		return;
 	}*/
-	if(tongue.canExtend){
+	if(e.which != 1)
+		return;
+	if(tongue.canExtend && !tongue.extending){
 		var mouse = new Vector(0, 0);
 		mouse.x = e.pageX - e.target.offsetLeft;
 		mouse.y = e.pageY - e.target.offsetTop;
 		tongue.extending = true;
 		tongue.currSegment = new Segment(tongue.movable.pos.x,tongue.movable.pos.y,1);
-		tongue.currSegment.end = mouse;
+		tongue.mouse = mouse;
 	}
 });
 
@@ -58,7 +60,7 @@ addEventListener("mousemove",function(e) {
 	mouse.y = e.pageY - e.target.offsetTop;
 	//console.log(mouse.x + ',' + mouse.y);
 	if(tongue.extending && tongue.canExtend) {
-		tongue.currSegment.end = lerpVector(tongue.currSegment.end,mouse,0.8);
+		//tongue.currSegment.end = lerpVector(tongue.currSegment.end,mouse,0.8);
 		tongue.mouse = mouse;
 	}
 });
