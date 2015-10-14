@@ -1,5 +1,7 @@
 var Movable = function(x, y, mass) 
 {
+	mass = mass || 1;
+	
     this.pos = new Vector(x, y);
     this.vel = new Vector(0, 0);
     this.accel = new Vector(0, 0);
