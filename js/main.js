@@ -48,6 +48,7 @@ function update() {
 	ctx.restore();
 	//tongue code
 	tongue.draw(ctx);
+	hud.updateTongueMeter(tongue);
 	hud.draw();
 	
 }
