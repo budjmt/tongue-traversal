@@ -5,7 +5,23 @@ var HUD = function(strokeStyle,gradColor){
     this.width = canvas.width;
     this.height = canvas.height/8;
     this.strokeStyle = strokeStyle;
-    this.stroke
+    
+    this.TongueMeter = Object.seal({
+        width: undefined,
+        height: undefined,
+        position: undefined,
+        fillStyle: "black",
+        barFillStyle: "red",
+        barMaxWidth: undefined,
+        barWidth: undefined,
+    });
+    
+    this.TongueMeter.width = this.width/3,
+    this.TongueMeter.height = this.height - this.height/4,
+    this.TongueMeter.position = undefined,
+    this.TongueMeter.barWidth = this.TongueMeter.width,
+    this.TongueMeter.barMaxWidth = this.TongueMeter.width,
+    this.TongueMeter.position = new Vector(10, this.height/2 - this.TongueMeter.height/2);
     
     var gradient = ctx.createLinearGradient(0,0,0,this.height);
     gradient.addColorStop(0,"rgb(25,25,25)");
@@ -63,6 +79,37 @@ HUD.prototype.drawCircle = function(color,i,isBack){
     ctx.restore();
 }
 
+HUD.prototype.updateTongueMeter = function(tongue){
+    if (!tongue.canExtend) {
+        if (tongue.numSegments == 1) {
+            this.TongueMeter.barWidth = this.TongueMeter.barMaxWidth;
+        }else{
+            this.TongueMeter.barWidth = lerp(this.TongueMeter.barWidth,this.TongueMeter.barMaxWidth * (mapValue(tongue.MeterLength,0,tongue.MeterMax)),0.5);
+        }
+    }else if (tongue.extending) {
+        this.TongueMeter.barWidth = lerp(this.TongueMeter.barWidth,this.TongueMeter.barMaxWidth * (mapValue(tongue.MeterLength,0,tongue.MeterMax)),0.5);
+    }
+    
+}
+
+var mapValue = function(input,outLow,outHigh){
+	return (input-outLow)/(outHigh-outLow);
+}
+
+HUD.prototype.drawTongueMeter = function(){
+    ctx.save();
+        ctx.strokeStyle = "black";
+        ctx.save();
+            ctx.globalAlpha = 0.5;
+            ctx.fillStyle = this.TongueMeter.fillStyle;
+            ctx.fillRect(this.TongueMeter.position.x,this.TongueMeter.position.y,this.TongueMeter.width,this.TongueMeter.height);
+        ctx.restore();
+        
+        ctx.fillStyle = this.TongueMeter.barFillStyle;
+        ctx.fillRect(this.TongueMeter.position.x,this.TongueMeter.position.y,this.TongueMeter.barWidth,this.TongueMeter.height);
+    ctx.restore();
+}
+
 HUD.prototype.draw = function(){
     ctx.save();
     ctx.shadowBlur = 20;
@@ -76,5 +123,6 @@ HUD.prototype.draw = function(){
     ctx.shadowBlur = 6;
     ctx.shadowColor = "rgba(10,10,10,0.25)";
     this.drawHealth();
+    this.drawTongueMeter();
     ctx.restore();
 }

@@ -50,6 +50,8 @@ function update() {
 	//tongue code
 	tongue.draw(ctx);
 	player.draw(ctx);
+	
+	hud.updateTongueMeter(tongue);
 	hud.draw();
 	
 }

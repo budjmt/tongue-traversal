@@ -25,9 +25,12 @@ var Tongue = function() {
 	this.extending = false;//when you are moving the tongue around
 	
 	this.lerpSum = 0.4;
+	this.MeterLength = 1000;
+	this.MeterMax = 1000;
 	
 	this.mouse = null;//this is so that the new segments aren't weird
 }
+
 
 Tongue.prototype.update = function(dt) {
 	if(this.numSegments > 0)
@@ -57,8 +60,21 @@ Tongue.prototype.update = function(dt) {
 											,this.numSegments + 1);
 			this.currSegment.end = this.mouse;
 			this.currTime = 0;
+			
+			this.MeterLength -= this.currSegment.length();
+		}else{
+			this.MeterLength -= 1;
 		}
+		/*
 		if(this.numSegments >= this.maxSegments) {
+			this.canExtend = false;
+			this.currTotalSegments = this.numSegments;
+			this.currTime = 0;
+		}
+		*/
+		if (this.MeterLength <= 0) {
+			//debugger;
+			this.MeterLength = this.MeterMax;
 			this.canExtend = false;
 			this.currTotalSegments = this.numSegments;
 			this.currTime = 0;
@@ -72,8 +88,10 @@ Tongue.prototype.update = function(dt) {
 Tongue.prototype.draw = function(ctx) {
 	ctx.save();
 	var r = 150, g = 50, b = 50;
-	this.segments.forEach(function(element) { 
-		r += 10; g += 3; b += 3;
+	this.segments.forEach(function(element) {
+		if (r < 600) {
+			r += 10; g += 3; b += 3;
+		}
 		var color = 'rgb(' + r + ',' + g + ',' + b + ')';
 		ctx.strokeStyle = color;
 		ctx.fillStyle = color;
