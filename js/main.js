@@ -1,6 +1,8 @@
 var canvas, ctx;
 var lastFrame, dt;
+var gamePaused;
 
+var player;
 var tongue;
 var hud;
 
@@ -9,14 +11,15 @@ window.onload = function() {
 	ctx = canvas.getContext('2d');
 	
 	lastFrame = +Date.now();
+	gamePaused = false;
 	
+	player = new Player(20,canvas.height-20,20,20,"black","red",100);
 	tongue = new Tongue();
-	//player = new Player(20,canvas.height-20,20,20,"black","red",1000000000000);
 	hud = new HUD("black","black");
 	update();
 }
 
-function calcDT(){
+function updateDeltaTime(){
 	var currFrame = +Date.now();
 	dt = currFrame - lastFrame;
 	dt /= 1000;
@@ -26,14 +29,12 @@ function calcDT(){
 function update() {
 	requestAnimationFrame(update);
 	
-	calcDT();
+	updateDeltaTime();
 	
-	//player and tongue don't play nice atm
-	
-	//player.update(dt,ctx);
+	player.update(dt,ctx);
 	tongue.update(dt);
 	
-	//ctx.clearRect(0,0,canvas.width,canvas.height);
+	ctx.clearRect(0,0,canvas.width,canvas.height);
 	
 	hud.update();
 	keyUpdate();
@@ -48,6 +49,7 @@ function update() {
 	ctx.restore();
 	//tongue code
 	tongue.draw(ctx);
+	player.draw(ctx);
 	hud.draw();
 	
 }

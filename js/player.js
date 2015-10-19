@@ -4,8 +4,31 @@ var Player = function(initX,initY,WIDTH,HEIGHT,strokeStyle,fillStyle,maxSpeed){
     this.strokeStyle = strokeStyle;
     this.fillStyle = fillStyle;
     this.health = 6;
-    this.movable = new Movable(initX,initY,maxSpeed);
+    this.movable = new Movable(initX,initY,1,maxSpeed);
     this.alive = true;
+	this.forces = [];
+}
+
+Player.prototype.calcForces = function(dt) {
+		this.forces.push(new Vector(0,9.8 * this.movable.mass));
+		//drag
+		this.forces.push(this.movable.vel.mult(this.movable.vel.mag() * -0.2 * this.movable.mass));
+}
+
+Player.prototype.keyHandler = function() { 
+	this.forces = [];
+	if (keys[KeyCode.W]||keys[KeyCode.Up]) {
+        this.forces.push(new Vector(0,-2000 / dt));
+    }
+    if (keys[KeyCode.S]||keys[KeyCode.Down]) {
+        this.forces.push(new Vector(0,1000 / dt));
+    }
+    if (keys[KeyCode.A]||keys[KeyCode.Left]) {
+        this.forces.push(new Vector(-1000 / dt,0));
+    }
+    if (keys[KeyCode.D]||keys[KeyCode.Right]) {
+        this.forces.push(new Vector(1000 / dt,0));
+    }
 }
 
 Player.prototype.update = function(dt){
@@ -22,31 +45,17 @@ Player.prototype.takeDamage = function(damage){
 
 Player.prototype.move = function(dt){
     
-    this.movable.accel.x = 0;
-	this.movable.accel.y = 0;
-    
     if (this.movable.pos.y + this.height > canvas.height-1) {
         this.movable.pos.y = canvas.height-this.height;
         this.movable.accel.y = 0;
         this.movable.vel.y = 0;
     }else{
-        this.movable.accel.y += 15000;
+        //this.movable.accel.y += 15000;
     }
     
-    if (keys[KeyCode.W||keys[KeyCode.Up]]) {
-        this.movable.accel.y = -20000;
-    }
-    if (keys[KeyCode.S||keys[KeyCode.Down]]) {
-        this.movable.accel.y = 10000;
-    }
-    if (keys[KeyCode.A||keys[KeyCode.Left]]) {
-        this.movable.accel.x = -10000;
-    }
-    if (keys[KeyCode.D||keys[KeyCode.Right]]) {
-        this.movable.accel.x = 10000;
-    }
-    
-    this.movable.update(dt);
+	this.calcForces(dt);
+    this.movable.update(dt,this.forces);
+	this.forces = [];
 }
 
 Player.prototype.draw = function(){

@@ -8,13 +8,13 @@ Segment.prototype.length = function() {
 	return this.end.sub(this.start).mag();
 }
 
-Segment.prototype.retract = function() {
+Segment.prototype.retract = function(lerpSpeed) {
 	var slope = (this.end.y - this.start.y) / (this.end.x - this.start.x);
-	this.end = lerpVector(this.end,this.start,0.5);
+	this.end = lerpVector(this.end,this.start,clamp(lerpSpeed,0,0.8));
 }
 
 var Tongue = function() {
-	this.movable = new Movable(20,canvas.height - 20);
+	this.movable = player.movable;
 	this.segments = [];
 	this.numSegments = 0;//because length is not accurate
 	this.maxSegments = 20;
@@ -24,20 +24,26 @@ var Tongue = function() {
 	this.canExtend = true;//you can extend if you aren't retracting
 	this.extending = false;//when you are moving the tongue around
 	
+	this.lerpSum = 0.4;
+	
 	this.mouse = null;//this is so that the new segments aren't weird
 }
 
 Tongue.prototype.update = function(dt) {
+	if(this.numSegments > 0)
+		this.segments[0].start = player.movable.pos.add(new Vector(player.width / 2, player.height / 2));
 	if(!this.canExtend) {
-		this.currSegment.retract();
+		this.currSegment.retract(this.lerpSum);
 		if(this.currSegment.end.sub(this.currSegment.start).mag() < 0.1) {
 			this.segments.pop();
 			this.currSegment = this.segments[this.segments.length - 1];
 			this.numSegments--;
+			this.lerpSum += 0.035;
 			if(this.numSegments < 1) {
 				this.currSegment = null;
 				this.canExtend = true;
 				this.extending = false;
+				this.lerpSum = 0.5;
 			}
 		}
 	}
@@ -54,6 +60,7 @@ Tongue.prototype.update = function(dt) {
 		}
 		if(this.numSegments >= this.maxSegments) {
 			this.canExtend = false;
+			this.currTotalSegments = this.numSegments;
 			this.currTime = 0;
 		}
 		else {
@@ -67,19 +74,30 @@ Tongue.prototype.draw = function(ctx) {
 	var r = 150, g = 50, b = 50;
 	this.segments.forEach(function(element) { 
 		r += 10; g += 3; b += 3;
-		ctx.strokeStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+		var color = 'rgb(' + r + ',' + g + ',' + b + ')';
+		ctx.strokeStyle = color;
+		ctx.fillStyle = color;
 		ctx.lineWidth = Math.min(50, 50 / element.length() * 100);
 		ctx.beginPath();
 		ctx.moveTo(element.start.x,element.start.y);
 		ctx.lineTo(element.end.x,element.end.y);
 		ctx.stroke();
+		ctx.beginPath();
+		ctx.arc(element.end.x,element.end.y,ctx.lineWidth / 2,0,Math.PI * 2,false);
+		ctx.fill();
 	});
 	if(this.currSegment != null) {
 		r += 10; g += 3; b += 3;
-		ctx.strokeStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+		var color = 'rgb(' + r + ',' + g + ',' + b + ')';
+		ctx.strokeStyle = color;
+		ctx.fillStyle = color;
 		ctx.beginPath();
 		ctx.moveTo(this.currSegment.start.x,this.currSegment.start.y);
 		ctx.lineTo(this.currSegment.end.x,this.currSegment.end.y);
 		ctx.stroke();
+		ctx.beginPath();
+		ctx.arc(this.currSegment.end.x,this.currSegment.end.y,ctx.lineWidth / 2,0,Math.PI * 2,false);
+		ctx.fill();
 	}
+	ctx.restore();
 }
