@@ -19,6 +19,8 @@ Vector.prototype.setMag = function(newMag)
 Vector.prototype.normalize = function()
 {
 	var mag = this.mag();
+	if(mag == 0)
+		return this.copy();
 	return new Vector(this.x / mag, this.y / mag);
 }
 
