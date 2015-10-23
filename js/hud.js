@@ -10,10 +10,13 @@ var HUD = function(strokeStyle,gradColor){
         width: undefined,
         height: undefined,
         position: undefined,
+        positionInitial: undefined,
         fillStyle: "black",
         barFillStyle: "red",
         barMaxWidth: undefined,
         barWidth: undefined,
+        bar2Width: undefined,
+        shakeAmount: 2,
         r: 400,
         g: 200,
         b: 200,
@@ -24,10 +27,11 @@ var HUD = function(strokeStyle,gradColor){
     
     this.TongueMeter.width = this.width/3,
     this.TongueMeter.height = this.height - this.height/4,
-    this.TongueMeter.position = undefined,
-    this.TongueMeter.barWidth = this.TongueMeter.width,
-    this.TongueMeter.barMaxWidth = this.TongueMeter.width,
+    this.TongueMeter.barWidth = this.TongueMeter.width;
+    this.TongueMeter.bar2Width = this.TongueMeter.width;
+    this.TongueMeter.barMaxWidth = this.TongueMeter.width;
     this.TongueMeter.position = new Vector(10, this.height/2 - this.TongueMeter.height/2);
+    this.TongueMeter.positionInitial = new Vector(this.TongueMeter.position.x,this.TongueMeter.position.y);
     
     var gradient = ctx.createLinearGradient(0,0,0,this.height);
     gradient.addColorStop(0,"rgb(25,25,25)");
@@ -89,34 +93,41 @@ HUD.prototype.updateTongueMeter = function(tongue){
     if (!tongue.canExtend) {
         if (tongue.numSegments == 1) {
             this.TongueMeter.barWidth = this.TongueMeter.barMaxWidth;
-            /*
             this.TongueMeter.r = this.TongueMeter.rMax;
-            this.TongueMeter.g = this.TongueMeter.gMax;
-            this.TongueMeter.b = this.TongueMeter.bMax;
-            */
-        }else{            
-            this.TongueMeter.barWidth = lerp(this.TongueMeter.barWidth,this.TongueMeter.barMaxWidth * (mapValue(tongue.MeterLength,0,tongue.MeterMax)),0.5);
-            this.TongueMeter.r = lerp(this.TongueMeter.r,this.TongueMeter.rMax *mapValue(tongue.MeterLength,0,tongue.MeterMax),0.5);
-            this.TongueMeter.g = lerp(this.TongueMeter.g,this.TongueMeter.gMax *mapValue(tongue.MeterLength,0,tongue.MeterMax),0.5);
-            this.TongueMeter.b = lerp(this.TongueMeter.b,this.TongueMeter.bMax *mapValue(tongue.MeterLength,0,tongue.MeterMax),0.5);
+            this.TongueMeter.g = this.TongueMeter.bMax;
+            this.TongueMeter.b = this.TongueMeter.gMax;
+
+        }else{
+            this.TongueMeter.barWidth = lerp(this.TongueMeter.barWidth,this.TongueMeter.barMaxWidth * (mapValue(tongue.meterLength,0,tongue.meterMax)),0.5);
+            this.TongueMeter.bar2Width = lerp(this.TongueMeter.bar2Width,this.TongueMeter.barMaxWidth * (mapValue(tongue.meterLength,0,tongue.meterMax)),0.06);
+            this.TongueMeter.r = lerp(this.TongueMeter.r,this.TongueMeter.rMax ,0.5);
+            this.TongueMeter.g = lerp(this.TongueMeter.g,this.TongueMeter.gMax ,0.5);
+            this.TongueMeter.b = lerp(this.TongueMeter.b,this.TongueMeter.bMax ,0.5);
+            this.TongueMeter.position = this.TongueMeter.positionInitial.copy();
         }
     }else if (tongue.extending) {
-        this.TongueMeter.barWidth = lerp(this.TongueMeter.barWidth,this.TongueMeter.barMaxWidth * (mapValue(tongue.MeterLength,0,tongue.MeterMax)),0.5);
+        var mappedValue = mapValue(tongue.meterLength,0,tongue.meterMax);
         //debugger;
-        console.log(this.TongueMeter.r);
-        this.TongueMeter.r = lerp(this.TongueMeter.r,this.TongueMeter.rMax *mapValue(tongue.MeterLength,0,tongue.MeterMax),0.5);
-        this.TongueMeter.g = lerp(this.TongueMeter.g,this.TongueMeter.gMax *mapValue(tongue.MeterLength,0,tongue.MeterMax),0.5);
-        this.TongueMeter.b = lerp(this.TongueMeter.b,this.TongueMeter.bMax *mapValue(tongue.MeterLength,0,tongue.MeterMax),0.5);
+        
+        this.TongueMeter.barWidth = lerp(this.TongueMeter.barWidth,this.TongueMeter.barMaxWidth * mappedValue,0.5);
+        this.TongueMeter.bar2Width = lerp(this.TongueMeter.bar2Width,this.TongueMeter.barMaxWidth * mappedValue,0.06);
+        this.TongueMeter.r = this.TongueMeter.r++
+        this.TongueMeter.g = lerp(this.TongueMeter.g,this.TongueMeter.gMax *mappedValue,0.5);
+        this.TongueMeter.b = lerp(this.TongueMeter.b,this.TongueMeter.bMax *mappedValue,0.5);
+        
+        var randX = (Math.random() > 0.5)?-Math.random()*this.TongueMeter.shakeAmount*(1-mappedValue):Math.random()*this.TongueMeter.shakeAmount*(1-mappedValue);
+        var randY = (Math.random() > 0.5)?-Math.random()*this.TongueMeter.shakeAmount*(1-mappedValue):Math.random()*this.TongueMeter.shakeAmount*(1-mappedValue);
+        
+        this.TongueMeter.position.x = this.TongueMeter.positionInitial.x - randX;
+        this.TongueMeter.position.y = this.TongueMeter.positionInitial.y - randY;
     }
-    
+    this.TongueMeter.r  = Math.floor(this.TongueMeter.r);
+    this.TongueMeter.g  = Math.floor(this.TongueMeter.g);
+    this.TongueMeter.b  = Math.floor(this.TongueMeter.b);
 }
 
 var mapValue = function(input,outLow,outHigh){
 	return (input-outLow)/(outHigh-outLow);
-}
-
-var max = function(a,b){
-    return (a>b)?a:b;
 }
 
 HUD.prototype.drawTongueMeter = function(){
@@ -127,9 +138,13 @@ HUD.prototype.drawTongueMeter = function(){
             ctx.fillStyle = this.TongueMeter.fillStyle;
             ctx.fillRect(this.TongueMeter.position.x,this.TongueMeter.position.y,this.TongueMeter.width,this.TongueMeter.height);
         ctx.restore();
-    
+        
         //var color = 'rgb(' + this.TongueMeter.r + ',' + this.TongueMeter.g + ',' + this.TongueMeter.b + ')';
-        ctx.fillStyle = 'rgb(' + 200+ ',' + 100 + ',' + 100 + ')';
+        ctx.fillStyle = "rgb(200,100,100)";
+        ctx.fillRect(this.TongueMeter.position.x,this.TongueMeter.position.y,this.TongueMeter.bar2Width,this.TongueMeter.height);
+        
+        var color = 'rgb(' + this.TongueMeter.r + ',' + this.TongueMeter.g + ',' + this.TongueMeter.b + ')';
+        ctx.fillStyle = color;
         ctx.fillRect(this.TongueMeter.position.x,this.TongueMeter.position.y,this.TongueMeter.barWidth,this.TongueMeter.height);
     ctx.restore();
 }
