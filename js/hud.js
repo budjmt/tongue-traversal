@@ -14,6 +14,12 @@ var HUD = function(strokeStyle,gradColor){
         barFillStyle: "red",
         barMaxWidth: undefined,
         barWidth: undefined,
+        r: 400,
+        g: 200,
+        b: 200,
+        rMax: 400,
+        gMax: 200,
+        bMax: 200,
     });
     
     this.TongueMeter.width = this.width/3,
@@ -83,17 +89,34 @@ HUD.prototype.updateTongueMeter = function(tongue){
     if (!tongue.canExtend) {
         if (tongue.numSegments == 1) {
             this.TongueMeter.barWidth = this.TongueMeter.barMaxWidth;
-        }else{
+            /*
+            this.TongueMeter.r = this.TongueMeter.rMax;
+            this.TongueMeter.g = this.TongueMeter.gMax;
+            this.TongueMeter.b = this.TongueMeter.bMax;
+            */
+        }else{            
             this.TongueMeter.barWidth = lerp(this.TongueMeter.barWidth,this.TongueMeter.barMaxWidth * (mapValue(tongue.MeterLength,0,tongue.MeterMax)),0.5);
+            this.TongueMeter.r = lerp(this.TongueMeter.r,this.TongueMeter.rMax *mapValue(tongue.MeterLength,0,tongue.MeterMax),0.5);
+            this.TongueMeter.g = lerp(this.TongueMeter.g,this.TongueMeter.gMax *mapValue(tongue.MeterLength,0,tongue.MeterMax),0.5);
+            this.TongueMeter.b = lerp(this.TongueMeter.b,this.TongueMeter.bMax *mapValue(tongue.MeterLength,0,tongue.MeterMax),0.5);
         }
     }else if (tongue.extending) {
         this.TongueMeter.barWidth = lerp(this.TongueMeter.barWidth,this.TongueMeter.barMaxWidth * (mapValue(tongue.MeterLength,0,tongue.MeterMax)),0.5);
+        //debugger;
+        console.log(this.TongueMeter.r);
+        this.TongueMeter.r = lerp(this.TongueMeter.r,this.TongueMeter.rMax *mapValue(tongue.MeterLength,0,tongue.MeterMax),0.5);
+        this.TongueMeter.g = lerp(this.TongueMeter.g,this.TongueMeter.gMax *mapValue(tongue.MeterLength,0,tongue.MeterMax),0.5);
+        this.TongueMeter.b = lerp(this.TongueMeter.b,this.TongueMeter.bMax *mapValue(tongue.MeterLength,0,tongue.MeterMax),0.5);
     }
     
 }
 
 var mapValue = function(input,outLow,outHigh){
 	return (input-outLow)/(outHigh-outLow);
+}
+
+var max = function(a,b){
+    return (a>b)?a:b;
 }
 
 HUD.prototype.drawTongueMeter = function(){
@@ -104,8 +127,9 @@ HUD.prototype.drawTongueMeter = function(){
             ctx.fillStyle = this.TongueMeter.fillStyle;
             ctx.fillRect(this.TongueMeter.position.x,this.TongueMeter.position.y,this.TongueMeter.width,this.TongueMeter.height);
         ctx.restore();
-        
-        ctx.fillStyle = this.TongueMeter.barFillStyle;
+    
+        //var color = 'rgb(' + this.TongueMeter.r + ',' + this.TongueMeter.g + ',' + this.TongueMeter.b + ')';
+        ctx.fillStyle = 'rgb(' + 200+ ',' + 100 + ',' + 100 + ')';
         ctx.fillRect(this.TongueMeter.position.x,this.TongueMeter.position.y,this.TongueMeter.barWidth,this.TongueMeter.height);
     ctx.restore();
 }
