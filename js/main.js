@@ -13,7 +13,7 @@ window.onload = function() {
 	lastFrame = +Date.now();
 	gamePaused = false;
 	
-	player = new Player(20,canvas.height-20,20,20,"black","red",100);
+	player = new Player(20,canvas.height-20,20,20,"black","red",10000000000000000000);
 	tongue = new Tongue();
 	hud = new HUD("black","black");
 	update();
