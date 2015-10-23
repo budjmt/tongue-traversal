@@ -34,3 +34,28 @@ Movable.prototype.update = function(dt,forces) {
 	
 	this.accel = this.accel.mult(0.);
 }
+
+
+Movable.prototype.update2 = function(dt,forces) {	
+	//this.calcForces(forces);
+	
+	this.vel = this.vel.mult(0.98);
+	
+	//var force;
+	//while(force = this.forces.pop())
+		//this.accel = this.accel.add(force.div(this.mass));
+	
+	this.accel = this.accel.add(forces.div(this.mass));
+	
+    this.vel = this.vel.add(this.accel.mult(dt));
+	var vel = this.vel.mag();
+	if (vel > this.maxSpeed) {
+		this.vel.setMag(this.maxSpeed);
+	}
+	else if(vel < 0.05)
+		this.vel.mult(0.);
+	
+    this.pos = this.pos.add(this.vel.mult(dt));
+	
+	this.accel = this.accel.mult(0.);
+}

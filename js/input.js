@@ -51,8 +51,12 @@ addEventListener("mousedown",function(e) {
 		tongue.extending = true;
 		tongue.currSegment = new Segment(0,0,1);
 		tongue.currSegment.start = player.movable.pos.add(new Vector(player.width / 2, player.height / 2));
-		tongue.currSegment.end = tongue.currSegment.start.copy();
 		tongue.mouse = mouse;
+		//tongue.currSegment.end = tongue.currSegment.start.copy();
+		tongue.currSegment.end = tongue.mouse;
+		
+		//Subtracs initial tongue length from the meter
+		tongue.MeterLength -= tongue.currSegment.length();
 	}
 });
 
