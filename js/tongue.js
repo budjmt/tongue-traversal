@@ -95,7 +95,7 @@ Tongue.prototype.draw = function(ctx) {
 		var color = 'rgb(' + r + ',' + g + ',' + b + ')';
 		ctx.strokeStyle = color;
 		ctx.fillStyle = color;
-		ctx.lineWidth = Math.min(50, 50 / element.length() * 100);
+		ctx.lineWidth = Math.min(20, 20 / element.length() * 200);
 		ctx.beginPath();
 		ctx.moveTo(element.start.x,element.start.y);
 		ctx.lineTo(element.end.x,element.end.y);

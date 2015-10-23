@@ -7,7 +7,7 @@ var Movable = function(x, y, mass, maxSpeed)
     this.accel = new Vector(0, 0);
 	this.forces = [];
 	this.maxSpeed = maxSpeed || 10;
-	this.maxForce = 750000;
+	this.maxForce = 1000000;
     this.mass = mass;
 	
 	this.debug = undefined;
@@ -38,6 +38,7 @@ Movable.prototype.update = function(dt,forces) {
 	//console.log("DONE");
     this.vel = this.vel.add(this.accel.mult(dt));
 	var vel = this.vel.mag();
+	
 	
 	if (vel > this.maxSpeed) {
 		this.vel.setMag(this.maxSpeed);

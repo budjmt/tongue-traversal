@@ -19,7 +19,7 @@ Player.prototype.calcForces = function(dt) {
 		//drag
 		var vel = this.movable.vel.mag();
 		var dir = this.movable.vel.normalize();
-		this.forces.push(dir.mult(vel * vel * -0.0125 * this.movable.mass));
+		this.forces.push(dir.mult(vel * vel * -0.035 * this.movable.mass));
 }
 
 Player.prototype.keyHandler = function() { 
@@ -28,7 +28,7 @@ Player.prototype.keyHandler = function() {
 Player.prototype.keyForces = function(dt) {
 	var moveForce = 50000;
 	if (!this.falling && (keys[KeyCode.W]||keys[KeyCode.Up])) {
-        this.forces.push(new Vector(0,-moveForce * this.movable.mass));
+        this.forces.push(new Vector(0,-moveForce * 0.75* this.movable.mass));
 		this.jumping = true;
 		this.jumpTime += dt;
 		if(this.jumpTime >= 0.125)
@@ -36,14 +36,15 @@ Player.prototype.keyForces = function(dt) {
     }
 	else if(this.jumping)
 		this.falling = true;
+    /*
     if (keys[KeyCode.S]||keys[KeyCode.Down]) {
         this.forces.push(new Vector(0,moveForce* 10000 * this.movable.mass));
-    }
+    }*/
     if (keys[KeyCode.A]||keys[KeyCode.Left]) {
-        this.forces.push(new Vector(-moveForce / 2 * this.movable.mass,0));
+        this.forces.push(new Vector(-moveForce / 10 * this.movable.mass,0));
     }
     if (keys[KeyCode.D]||keys[KeyCode.Right]) {
-        this.forces.push(new Vector(moveForce / 2* this.movable.mass,0));
+        this.forces.push(new Vector(moveForce / 10* this.movable.mass,0));
     }
 }
 
@@ -84,6 +85,7 @@ Player.prototype.draw = function(){
     ctx.beginPath();
     ctx.fillRect(this.movable.pos.x,this.movable.pos.y,this.width,this.height);
 	
+    
 	ctx.translate(this.movable.pos.x + this.width / 2,this.movable.pos.y + this.height / 2);
 	ctx.strokeStyle = 'cyan';
 	ctx.moveTo(0,0);
@@ -97,4 +99,5 @@ Player.prototype.draw = function(){
 	ctx.stroke();
     ctx.closePath();
     ctx.restore();
+    
 }

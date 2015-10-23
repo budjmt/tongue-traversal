@@ -34,7 +34,7 @@ function update() {
 	player.update(dt,ctx);
 	tongue.update(dt);
 	
-	ctx.clearRect(0,0,canvas.width,canvas.height);
+	
 	
 	hud.update();
 	keyUpdate();
@@ -44,8 +44,14 @@ function update() {
 	var gradient = ctx.createLinearGradient(0,0,0,canvas.height);
     gradient.addColorStop(0,"rgb(240,240,240)");
     gradient.addColorStop(1,"rgb(210,210,210)");
+	ctx.save();
+	ctx.globalAlpha = 0.7;
+	//ctx.clearRect(0,0,canvas.width,canvas.height);
+	
     ctx.fillStyle = gradient;
 	ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
+	ctx.restore();
+	
 	ctx.restore();
 	//tongue code
 	tongue.draw(ctx);
