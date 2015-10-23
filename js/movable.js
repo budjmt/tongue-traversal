@@ -7,7 +7,7 @@ var Movable = function(x, y, mass, maxSpeed)
     this.accel = new Vector(0, 0);
 	this.forces = [];
 	this.maxSpeed = maxSpeed || 10;
-	this.maxForce = 500000;
+	this.maxForce = 750000;
     this.mass = mass;
 	
 	this.debug = undefined;
@@ -18,53 +18,39 @@ Movable.prototype.calcForces = function (forces)
 	this.forces = forces.slice(0);
 }
 
-Movable.prototype.update = function(dt,forces) {	
+Movable.prototype.update = function(dt,forces) {
+	//debugger;
+	//this.vel = this.vel.add(new Vector(0,-5 / dt * this.mass));
 	this.calcForces(forces);
 	while(forces[0]) {
 		var force = forces.pop();
-		force = force.div(this.mass);
+		force = force.div(this.mass);/*
 		if(force.mag() > this.maxForce)
 			force.setMag(this.maxForce);
+			*/
 		this.accel = this.accel.add(force);
 		//console.log(this.accel);
 	}
+	//debugger;
+	//var grav = forces.pop();
+	
 	this.debug = this.accel;
 	//console.log("DONE");
     this.vel = this.vel.add(this.accel.mult(dt));
 	var vel = this.vel.mag();
 	
-	//if (vel > this.maxSpeed) {
-	//	this.vel.setMag(this.maxSpeed);
-	//}
-	if(vel < 0.05)
-		this.vel.mult(0.);
-	
-    this.pos = this.pos.add(this.vel.mult(dt));
-	
-	this.accel = this.accel.mult(0.);
-}
-
-
-Movable.prototype.update2 = function(dt,forces) {	
-	//this.calcForces(forces);
-	
-	this.vel = this.vel.mult(0.98);
-	
-	//var force;
-	//while(force = this.forces.pop())
-		//this.accel = this.accel.add(force.div(this.mass));
-	
-	this.accel = this.accel.add(forces.div(this.mass));
-	
-    this.vel = this.vel.add(this.accel.mult(dt));
-	var vel = this.vel.mag();
 	if (vel > this.maxSpeed) {
 		this.vel.setMag(this.maxSpeed);
 	}
-	else if(vel < 0.05)
+	this.vel = this.vel.add(new Vector(0,5 / dt * this.mass));
+	
+	if(vel < 0.05)
 		this.vel.mult(0.);
 	
-    this.pos = this.pos.add(this.vel.mult(dt));
 	
+	
+    this.pos = this.pos.add(this.vel.mult(dt));
+	//this.pos = this.pos.add(new Vector(0,5 / dt * this.mass));
 	this.accel = this.accel.mult(0.);
 }
+

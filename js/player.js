@@ -14,30 +14,30 @@ var Player = function(initX,initY,WIDTH,HEIGHT,strokeStyle,fillStyle,maxSpeed){
 
 Player.prototype.calcForces = function(dt) {
 		this.forces = [];
-		this.forces.push(new Vector(0,9.8 / dt * this.movable.mass));//this is super lazy lol
+		this.forces.push(new Vector(0,5/ dt * this.movable.mass));//this is super lazy lol
 		this.keyForces(dt);
 		//drag
 		var vel = this.movable.vel.mag();
 		var dir = this.movable.vel.normalize();
-		this.forces.push(dir.mult(vel * vel * -0.15 * this.movable.mass));
+		this.forces.push(dir.mult(vel * vel * -0.0125 * this.movable.mass));
 }
 
 Player.prototype.keyHandler = function() { 
 }
 
 Player.prototype.keyForces = function(dt) {
-	var moveForce = 5000;
+	var moveForce = 50000;
 	if (!this.falling && (keys[KeyCode.W]||keys[KeyCode.Up])) {
         this.forces.push(new Vector(0,-moveForce * this.movable.mass));
 		this.jumping = true;
 		this.jumpTime += dt;
-		if(this.jumpTime >= 0.5)
+		if(this.jumpTime >= 0.125)
 			this.falling = true;
     }
 	else if(this.jumping)
 		this.falling = true;
     if (keys[KeyCode.S]||keys[KeyCode.Down]) {
-        this.forces.push(new Vector(0,moveForce * this.movable.mass));
+        this.forces.push(new Vector(0,moveForce* 10000 * this.movable.mass));
     }
     if (keys[KeyCode.A]||keys[KeyCode.Left]) {
         this.forces.push(new Vector(-moveForce / 2 * this.movable.mass,0));
@@ -61,8 +61,8 @@ Player.prototype.takeDamage = function(damage){
 
 Player.prototype.move = function(dt){
     
-    if (this.movable.pos.y + this.height > canvas.height-1) {
-        this.movable.pos.y = canvas.height-this.height;
+    if (this.movable.pos.y + this.height > canvas.height-3) {
+        this.movable.pos.y = canvas.height-this.height-4;
         this.movable.accel.y = 0;
         this.movable.vel.y = 0;
 		this.jumping = false;
