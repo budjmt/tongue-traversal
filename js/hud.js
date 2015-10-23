@@ -84,10 +84,10 @@ HUD.prototype.updateTongueMeter = function(tongue){
         if (tongue.numSegments == 1) {
             this.TongueMeter.barWidth = this.TongueMeter.barMaxWidth;
         }else{
-            this.TongueMeter.barWidth = lerp(this.TongueMeter.barWidth,this.TongueMeter.barMaxWidth * (mapValue(tongue.MeterLength,0,tongue.MeterMax)),0.5);
+            this.TongueMeter.barWidth = lerp(this.TongueMeter.barWidth,this.TongueMeter.barMaxWidth * (mapValue(tongue.meterLength,0,tongue.meterMax)),0.5);
         }
     }else if (tongue.extending) {
-        this.TongueMeter.barWidth = lerp(this.TongueMeter.barWidth,this.TongueMeter.barMaxWidth * (mapValue(tongue.MeterLength,0,tongue.MeterMax)),0.5);
+        this.TongueMeter.barWidth = lerp(this.TongueMeter.barWidth,this.TongueMeter.barMaxWidth * (mapValue(tongue.meterLength,0,tongue.meterMax)),0.5);
     }
     
 }

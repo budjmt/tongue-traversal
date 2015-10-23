@@ -78,8 +78,8 @@ BoundingBox.prototype.intersects = function(other) {
 }
 
 BoundingBox.prototype.pointInside = function(x,y) {
-	return !(x < this.coords.x || x > this.coords.x + this.dims.x 
-	|| y < this.coords.y || y > this.coords.y + this.dims.y);
+	return x > this.coords.x - this.dims.x / 2 && x < this.coords.x + this.dims.x / 2
+	&& y > this.coords.y - this.dims.y / 2 && y < this.coords.y + this.dims.y / 2;
 }
 
 BoundingBox.prototype.basicIntersect = function(other) {
