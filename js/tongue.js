@@ -13,6 +13,12 @@ Segment.prototype.retract = function(lerpSpeed) {
 	this.end = lerpVector(this.end,this.start,clamp(lerpSpeed,0,0.8));
 }
 
+Segment.prototype.reverse = function(lerpSpeed) {
+	var slope = (this.end.y - this.start.y) / (this.end.x - this.start.x);
+	//console.log(this.start.x + ',' + this.start.y + '/' + this.end.x + ',' + this.end.y);
+	this.start = lerpVector(this.start,this.end,clamp(lerpSpeed,0,0.8));
+}
+
 var Tongue = function() {
 	this.movable = player.movable;
 	this.segments = [];
@@ -23,34 +29,66 @@ var Tongue = function() {
 	this.currSegment = null;
 	this.canExtend = true;//you can extend if you aren't retracting
 	this.extending = false;//when you are moving the tongue around
+	this.retracting = false;//when you retract towards it
 	
 	this.lerpSum = 0.4;
-	this.MeterLength = 1000;
-	this.MeterMax = 1000;
+	this.meterLength = 1000;
+	this.meterMax = 1000;
 	
 	this.mouse = null;//this is so that the new segments aren't weird
 }
 
+Tongue.prototype.retractTongue = function() {
+	this.currSegment.retract(this.lerpSum);
+	if(this.currSegment.length() < 0.1) {
+		this.segments.pop();
+		this.numSegments--;
+		this.currSegment = this.segments[this.numSegments];
+		this.lerpSum += 0.035;
+		if(this.numSegments < 1) {
+			this.currSegment = null;
+			this.canExtend = true;
+			this.extending = false;
+			this.lerpSum = 0.5;
+		}
+	}
+}
+
+Tongue.prototype.reverseTongue = function() {
+	this.segments[0].reverse(this.lerpSum);
+	player.movable.pos = this.segments[0].start;
+	if(this.segments[0].length() < 0.1) {
+		this.segments.shift();
+		this.numSegments--;
+		this.lerpSum += 0.035;
+		if(this.numSegments < 1) {
+			this.currSegment = null;
+			this.canExtend = true;
+			this.extending = false;
+			this.retracting = false;
+			this.lerpSum = 0.5;
+		}
+	}
+}
 
 Tongue.prototype.update = function(dt) {
-	if(this.numSegments > 0)
+	if(!this.retracting && this.numSegments > 0) {
 		this.segments[0].start = player.movable.pos.add(new Vector(player.width / 2, player.height / 2));
-	if(!this.canExtend) {
-		this.currSegment.retract(this.lerpSum);
-		if(this.currSegment.end.sub(this.currSegment.start).mag() < 0.1) {
-			this.segments.pop();
-			this.currSegment = this.segments[this.segments.length - 1];
-			this.numSegments--;
-			this.lerpSum += 0.035;
-			if(this.numSegments < 1) {
-				this.currSegment = null;
-				this.canExtend = true;
-				this.extending = false;
-				this.lerpSum = 0.5;
+		for(var i = 0;i < grapples.length;i++) {
+			if(grapples[i].collider.pointInside(this.currSegment.end.x,this.currSegment.end.y)) {
+				this.canExtend = false;
+				this.retracting = true;
+				break;
 			}
 		}
 	}
-	else if(this.extending) {		
+	if(!this.canExtend) {
+		if(!this.retracting)
+			this.retractTongue();
+		else
+			this.reverseTongue();
+	}
+	else if(this.extending) {
 		//console.log("YES");
 		this.currTime += dt
 		if(this.currTime >= this.duration) {
@@ -61,9 +99,9 @@ Tongue.prototype.update = function(dt) {
 			this.currSegment.end = this.mouse;
 			this.currTime = 0;
 			
-			this.MeterLength -= this.currSegment.length();
+			this.meterLength -= this.currSegment.length();
 		}else{
-			this.MeterLength -= 1;
+			this.meterLength -= 1;
 		}
 		/*
 		if(this.numSegments >= this.maxSegments) {
@@ -72,9 +110,9 @@ Tongue.prototype.update = function(dt) {
 			this.currTime = 0;
 		}
 		*/
-		if (this.MeterLength <= 0) {
+		if (this.meterLength <= 0) {
 			//debugger;
-			this.MeterLength = this.MeterMax;
+			this.meterLength = this.meterMax;
 			this.canExtend = false;
 			this.currTotalSegments = this.numSegments;
 			this.currTime = 0;
