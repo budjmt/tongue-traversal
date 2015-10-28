@@ -62,7 +62,7 @@ Player.prototype.takeDamage = function(damage){
 
 Player.prototype.move = function(dt){
     
-    if (this.movable.pos.y + this.height > canvas.height-3) {
+    if (this.movable.pos.y + this.height > canvas.height-3 && tongue.canExtend) {
         this.movable.pos.y = canvas.height-this.height-4;
         this.movable.accel.y = 0;
         this.movable.vel.y = 0;
