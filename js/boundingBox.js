@@ -82,6 +82,28 @@ BoundingBox.prototype.pointInside = function(x,y) {
 	&& y > this.coords.y - this.dims.y / 2 && y < this.coords.y + this.dims.y / 2;
 }
 
+BoundingBox.prototype.segmentInside = function(start,end) {
+	var dir = end.sub(start);
+	var t0 = 0;
+	var t1 = 1;
+	//dir = dir.normalize();
+	var invdir = new Vector(1 / dir.x, 1 / dir.y);
+	var topleft = this.coords.sub(this.dims.mult(0.5)), botright = this.coords.add(this.dims.mult(0.5));
+	var tmin = new Vector(0,0), tmax = new Vector(0,0);
+	tmin = topleft.sub(start); tmin.x *= invdir.x; tmin.y *= invdir.y;
+	tmax = botright.sub(start); tmax.x *= invdir.x; tmax.y *= invdir.y;
+	if(dir.x < 0) {	tmin.x ^= tmax.x; tmax.x ^= tmin.x; tmin.x ^= tmax.x; }
+	if(dir.y > 0) {	tmin.y ^= tmax.y; tmax.y ^= tmin.y; tmin.y ^= tmax.y; }
+	tmin = Math.min(tmin.x,tmin.y);
+	tmax = Math.max(tmax.x,tmax.y);
+	if (tmax <= t1 && tmin >= t0) {
+		console.log(t0 + ', ' + t1 + ' | ' + tmin + ', ' + tmax);
+		var t = (tmin + tmax) / 2;
+		return start.add(dir.mult(t));
+	}
+	return undefined;
+}
+
 BoundingBox.prototype.basicIntersect = function(other) {
 	/*
 	console.log("Other coords: " + other.coords);

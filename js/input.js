@@ -56,7 +56,20 @@ addEventListener("mousedown",function(e) {
 		tongue.currSegment.end = tongue.mouse;
 		
 		//Subtracs initial tongue length from the meter
-		tongue.MeterLength -= tongue.currSegment.length();
+		tongue.meterLength -= tongue.currSegment.length();
+		
+		//make sure there's no initial collision
+		for(var i = 0;i < grapples.length;i++) {
+			var colPoint = grapples[i].collider.segmentInside(tongue.currSegment.start,tongue.currSegment.end);
+			if(colPoint) {
+				tongue.canExtend = false;
+				tongue.retracting = true;
+				tongue.currSegment.end = colPoint;
+				tongue.segments.push(tongue.currSegment);
+				tongue.numSegments++;
+				break;
+			}
+		}
 	}
 });
 

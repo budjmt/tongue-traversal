@@ -43,13 +43,15 @@ Tongue.prototype.retractTongue = function() {
 	if(this.currSegment.length() < 0.1) {
 		this.segments.pop();
 		this.numSegments--;
-		this.currSegment = this.segments[this.numSegments];
+		this.currSegment = this.segments[this.numSegments - 1];
 		this.lerpSum += 0.035;
 		if(this.numSegments < 1) {
 			this.currSegment = null;
 			this.canExtend = true;
 			this.extending = false;
+			this.retracting = false;
 			this.lerpSum = 0.5;
+			this.meterLength = this.meterMax;
 		}
 	}
 }
@@ -67,12 +69,13 @@ Tongue.prototype.reverseTongue = function() {
 			this.extending = false;
 			this.retracting = false;
 			this.lerpSum = 0.5;
+			this.meterLength = this.meterMax;
 		}
 	}
 }
 
 Tongue.prototype.update = function(dt) {
-	if(!this.retracting && this.numSegments > 0) {
+	if(this.canExtend && this.numSegments > 0) {
 		this.segments[0].start = player.movable.pos.add(new Vector(player.width / 2, player.height / 2));
 		for(var i = 0;i < grapples.length;i++) {
 			if(grapples[i].collider.pointInside(this.currSegment.end.x,this.currSegment.end.y)) {
