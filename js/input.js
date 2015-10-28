@@ -59,15 +59,19 @@ addEventListener("mousedown",function(e) {
 		tongue.meterLength -= tongue.currSegment.length();
 		
 		//make sure there's no initial collision
-		for(var i = 0;i < grapples.length;i++) {
-			var colPoint = grapples[i].collider.segmentInside(tongue.currSegment.start,tongue.currSegment.end);
-			if(colPoint) {
-				tongue.canExtend = false;
-				tongue.retracting = true;
-				tongue.currSegment.end = colPoint;
-				tongue.segments.push(tongue.currSegment);
-				tongue.numSegments++;
-				break;
+		var dir = tongue.currSegment.end.sub(tongue.currSegment.start);
+		var collided = false;
+		for(var t = 0;!collided && t <= 1;t += 0.01) {
+			var cast = tongue.currSegment.start.add(dir.mult(t));
+			for(var i = 0;!collided && i < grapples.length;i++) {
+				if(grapples[i].collider.pointInside(cast.x,cast.y)) {
+					tongue.canExtend = false;
+					tongue.retracting = true;
+					tongue.currSegment.end = cast;
+					tongue.segments.push(tongue.currSegment);
+					tongue.numSegments++;
+					collided = true;
+				}
 			}
 		}
 	}
