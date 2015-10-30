@@ -44,6 +44,13 @@ addEventListener("mousedown",function(e) {
 		resumeGame();
 		return;
 	}
+	if (state == GAME_STATE.BEGIN) {
+		state = GAME_STATE.PLAYING;
+		return;
+	} else if (state == GAME_STATE.FINISHED) {
+		state = GAME_STATE.PLAYING;
+		return;
+	}
 	if(tongue.canExtend && !tongue.extending){
 		var mouse = new Vector(0, 0);
 		mouse.x = e.pageX - e.target.offsetLeft;

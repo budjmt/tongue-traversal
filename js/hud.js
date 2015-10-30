@@ -37,7 +37,7 @@ var HUD = function(strokeStyle,gradColor){
     gradient.addColorStop(0,"rgb(25,25,25)");
     gradient.addColorStop(1,gradColor);
     this.fillStyle = gradient;
-    this.opacity = 0.125;
+    this.opacity = 0.75;
     this.healthLineWidth = 1;
     HEALTH_RADIUS = this.height/2 - this.height/4;
     this.maxHealth = 4;

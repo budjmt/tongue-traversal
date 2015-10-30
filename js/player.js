@@ -70,9 +70,10 @@ Player.prototype.update = function(dt){
 	this.collider.update(this.movable.pos);
 	this.forces = [];
 	var colliding = false;
+    var collidables = grapples.concat(obstacles);
 	do {
-		for(var i = 0;i < grapples.length;i++) {
-			var manifold = grapples[i].collider.intersects(this.collider);
+		for(var i = 0;i < collidables.length;i++) {
+			var manifold = collidables[i].collider.intersects(this.collider);
 			if(manifold) {
 				//console.log(manifold.pen);
 				var dir = 1;
@@ -84,6 +85,13 @@ Player.prototype.update = function(dt){
 				this.jumping = false;
 				this.jumpTime = 0;
 				this.falling = false;
+				break;
+			}
+		}
+        for(var i = 0;i < goals.length;i++) {
+			var manifold = goals[i].collider.intersects(this.collider);
+			if(manifold) {
+				state = GAME_STATE.FINISHED;
 				break;
 			}
 		}
