@@ -50,7 +50,7 @@ addEventListener("mousedown",function(e) {
 		mouse.y = e.pageY - e.target.offsetTop;
 		tongue.extending = true;
 		tongue.currSegment = new Segment(0,0,1);
-		tongue.currSegment.start = player.movable.pos.add(new Vector(player.width / 2, player.height / 2));
+		tongue.currSegment.start = tongue.movable.pos.add(new Vector(player.width / 2, player.height / 2));
 		tongue.mouse = mouse;
 		//tongue.currSegment.end = tongue.currSegment.start.copy();
 		tongue.currSegment.end = tongue.mouse;

@@ -1,7 +1,7 @@
 var GrappleObject = function(x,y,w,h){
     this.movable = new Movable(x,y);
 	this.dims = new Vector(w,h);
-	this.collider = new BoundingBox(new Vector(x,y),new Vector(w,h));
+	this.collider = new BoundingBox(this.movable.pos,this.dims);
 	var r = Math.floor(Math.random() * 256);
 	var g = Math.floor(Math.random() * 256);
 	var b = Math.floor(Math.random() * 256);

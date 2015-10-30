@@ -5,6 +5,7 @@ var Player = function(initX,initY,WIDTH,HEIGHT,strokeStyle,fillStyle,maxSpeed){
     this.fillStyle = fillStyle;
     this.health = 6;
     this.movable = new Movable(initX,initY,1,maxSpeed);
+	this.collider = new BoundingBox(this.movable.pos,new Vector(WIDTH,HEIGHT));
     this.alive = true;
 	this.forces = [];
 	this.jumping = false;
@@ -48,8 +49,46 @@ Player.prototype.keyForces = function(dt) {
     }
 }
 
+Player.prototype.constrain = function() {
+	if (this.movable.pos.y + this.height / 2 > canvas.height-3 && tongue.canExtend) {
+        this.movable.pos.y = canvas.height - this.height / 2 - 4;
+		//this.collider.update(this.movable.pos);
+        this.movable.accel.y = 0;
+        this.movable.vel.y = 0;
+		this.jumping = false;
+		this.jumpTime = 0;
+		this.falling = false;
+    }else{
+        //this.movable.accel.y += 15000;
+    }
+}
+
 Player.prototype.update = function(dt){
-    this.move(dt);
+	this.constrain();
+	this.calcForces(dt);
+    this.movable.update(dt,this.forces);
+	this.collider.update(this.movable.pos);
+	this.forces = [];
+	var colliding = false;
+	do {
+		for(var i = 0;i < grapples.length;i++) {
+			var manifold = grapples[i].collider.intersects(this.collider);
+			if(manifold) {
+				//console.log(manifold.pen);
+				var dir = 1;
+				if(manifold.originator != this.collider)
+					dir *= -1;
+				this.move(manifold.norm.mult(manifold.pen * dir));
+				this.movable.accel.y = 0;
+				this.movable.vel.y = 0;
+				this.jumping = false;
+				this.jumpTime = 0;
+				this.falling = false;
+				break;
+			}
+		}
+	} while(colliding);
+	tongue.movable.pos = this.movable.pos;
     this.draw();
 }
 
@@ -60,22 +99,9 @@ Player.prototype.takeDamage = function(damage){
     }
 }
 
-Player.prototype.move = function(dt){
-    
-    if (this.movable.pos.y + this.height > canvas.height-3 && tongue.canExtend) {
-        this.movable.pos.y = canvas.height-this.height-4;
-        this.movable.accel.y = 0;
-        this.movable.vel.y = 0;
-		this.jumping = false;
-		this.jumpTime = 0;
-		this.falling = false;
-    }else{
-        //this.movable.accel.y += 15000;
-    }
-    
-	this.calcForces(dt);
-    this.movable.update(dt,this.forces);
-	this.forces = [];
+Player.prototype.move = function(v){
+    this.movable.pos = this.movable.pos.add(v);
+	this.collider.update(this.movable.pos);
 }
 
 Player.prototype.draw = function(){
@@ -83,7 +109,8 @@ Player.prototype.draw = function(){
     ctx.strokeStyle = this.strokeStyle;
     ctx.fillStyle = this.fillStyle;
     ctx.beginPath();
-    ctx.fillRect(this.movable.pos.x,this.movable.pos.y,this.width,this.height);
+    ctx.fillRect(this.movable.pos.x - this.width / 2,this.movable.pos.y - this.height / 2
+	,this.width,this.height);
 	
     
 	ctx.translate(this.movable.pos.x + this.width / 2,this.movable.pos.y + this.height / 2);
