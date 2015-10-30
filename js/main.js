@@ -5,6 +5,10 @@ var gamePaused;
 var player;
 var tongue;
 var hud;
+var emitter;
+
+var pulsar;
+var exhaust;
 
 var textures = Object.seal({
 	obstacle: new Image(),
@@ -23,9 +27,7 @@ var GAME_STATE = Object.freeze({
 });
 
 var state;
-
 var animFrame;
-
 var image;
 
 window.onblur = function(){
@@ -46,11 +48,17 @@ window.onload = function() {
 	
 	lastFrame = +Date.now();
 	gamePaused = false;
-	
+
 	
 	image = new Image();
 	image.src = 'media/obstacleTile.png';
 
+	exhaust = new Emitter();
+	exhaust.numParticles = 100;
+	exhaust.red = 255;
+	exhaust.green = 150;
+	exhaust.createParticles({x:100,y:100});
+	
 	image.onload = function(){
 		var pattern = ctx.createPattern(image,"no-repeat")
 		
@@ -90,19 +98,8 @@ window.onload = function() {
 		var obstHeight = canvas.height/20;
 		for(var i = 0; i < 20; i++){
 			for(var k = 0; k < 31; k++){
-				//debugger;
-				if (obstacleMap[(i*31)+k] == "O") {
-					debugger;
-					var widthCounter = 1;
-					for(var l = k+1; l < 31; l++){
-						if (obstacleMap[(i*31)+k] == "O"){
-							widthCounter++;
-							k++;
-						}
-						else
-							break;
-					}
-					obstacles.push(new Environment(k*obstWidth,i*obstHeight,widthCounter*obstWidth,obstHeight,image));
+				if (obstacleMap[(i*31)+k] == "O"){ 
+					obstacles.push(new Environment(k*obstWidth,i*obstHeight,obstWidth,obstHeight,image));
 				}else if (obstacleMap[(i*31)+k] == "G") {
 					grapples.push(new GrappleObject(k * obstWidth, i * obstHeight, obstWidth, obstHeight))
 				}else if (obstacleMap[(i*31)+k] == "E") {
@@ -114,6 +111,8 @@ window.onload = function() {
 		player = new Player(20,canvas.height-100,20,20,"black","red",10000000000000000000);
 		tongue = new Tongue();
 		hud = new HUD("black","black");
+
+		
 		update();
 	}
 	
@@ -230,6 +229,7 @@ function update() {
 	}else if (state == GAME_STATE.FINISHED) {
 		finished();
 	}
+	exhaust.updateAndDraw(ctx,{x:100,y:100});
 }
 
 //helper functions
