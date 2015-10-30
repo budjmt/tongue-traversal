@@ -70,22 +70,27 @@ Player.prototype.update = function(dt){
 	this.collider.update(this.movable.pos);
 	this.forces = [];
 	var colliding = false;
+	if(!tongue.retracting) {
     var collidables = grapples.concat(obstacles);
 	do {
-		for(var i = 0;i < collidables.length;i++) {
+		colliding = false;
+		for(var i = 0;!colliding && i < collidables.length;i++) {
 			var manifold = collidables[i].collider.intersects(this.collider);
-			if(manifold) {
+			if(manifold && manifold.pen < -0.01) {
+				//debugger;
 				//console.log(manifold.pen);
 				var dir = 1;
 				if(manifold.originator != this.collider)
 					dir *= -1;
 				this.move(manifold.norm.mult(manifold.pen * dir));
-				this.movable.accel.y = 0;
-				this.movable.vel.y = 0;
-				this.jumping = false;
-				this.jumpTime = 0;
-				this.falling = false;
-				break;
+				if(manifold.norm.x * dir < 0.01 && manifold.norm.y * dir > 0) {
+					this.movable.accel.y = 0;
+					this.movable.vel.y = 0;
+					this.jumping = false;
+					this.jumpTime = 0;
+					this.falling = false;
+				}
+				colliding = true;
 			}
 		}
         for(var i = 0;i < goals.length;i++) {
@@ -96,6 +101,7 @@ Player.prototype.update = function(dt){
 			}
 		}
 	} while(colliding);
+	}
 	tongue.movable.pos = this.movable.pos;
     this.draw();
 }

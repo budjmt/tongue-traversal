@@ -92,17 +92,7 @@ window.onload = function() {
 			for(var k = 0; k < 31; k++){
 				//debugger;
 				if (obstacleMap[(i*31)+k] == "O") {
-					debugger;
-					var widthCounter = 1;
-					for(var l = k+1; l < 31; l++){
-						if (obstacleMap[(i*31)+k] == "O"){
-							widthCounter++;
-							k++;
-						}
-						else
-							break;
-					}
-					obstacles.push(new Environment(k*obstWidth,i*obstHeight,widthCounter*obstWidth,obstHeight,image));
+					obstacles.push(new Environment(k*obstWidth,i*obstHeight,obstWidth,obstHeight,image));
 				}else if (obstacleMap[(i*31)+k] == "G") {
 					grapples.push(new GrappleObject(k * obstWidth, i * obstHeight, obstWidth, obstHeight))
 				}else if (obstacleMap[(i*31)+k] == "E") {
