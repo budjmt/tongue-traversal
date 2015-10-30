@@ -2,9 +2,9 @@ var GrappleObject = function(x,y,w,h){
     this.movable = new Movable(x,y);
 	this.dims = new Vector(w,h);
 	this.collider = new BoundingBox(this.movable.pos,this.dims);
-	var r = Math.floor(Math.random() * 256);
-	var g = Math.floor(Math.random() * 256);
-	var b = Math.floor(Math.random() * 256);
+	var r = Math.floor(Math.random() * 220);
+	var g = Math.floor(Math.random() * 220);
+	var b = Math.floor(Math.random() * 220);
 	this.color = 'rgb(' + r + ',' + g + ',' + b + ')';
 }
 

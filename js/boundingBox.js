@@ -1,3 +1,4 @@
+"use strict";
 function BoundingBox(coords,dims) {
 	this.coords = coords;//these are both vectors, center is x and y
 	this.toCorner = null;

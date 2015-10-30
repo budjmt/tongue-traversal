@@ -1,3 +1,4 @@
+"use strict";
 var Vector = function(initX, initY)
 {
 	this.x = initX;

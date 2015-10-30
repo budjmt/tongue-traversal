@@ -1,3 +1,4 @@
+"use strict";
 var Segment = function(x,y,num) {
 	this.start = new Vector(x,y);
 	this.end = new Vector(x,y);
@@ -15,7 +16,6 @@ Segment.prototype.retract = function(lerpSpeed) {
 
 Segment.prototype.reverse = function(lerpSpeed) {
 	var slope = (this.end.y - this.start.y) / (this.end.x - this.start.x);
-	//console.log(this.start.x + ',' + this.start.y + '/' + this.end.x + ',' + this.end.y);
 	this.start = lerpVector(this.start,this.end,clamp(lerpSpeed,0,0.8));
 }
 
@@ -32,8 +32,8 @@ var Tongue = function() {
 	this.retracting = false;//when you retract towards it
 	
 	this.lerpSum = 0.4;
-	this.meterLength = 1000;
-	this.meterMax = 1000;
+	this.meterLength = 500;
+	this.meterMax = 500;
 	
 	this.mouse = null;//this is so that the new segments aren't weird
 }
@@ -100,7 +100,6 @@ Tongue.prototype.update = function(dt) {
 			this.reverseTongue();
 	}
 	else if(this.extending) {
-		//console.log("YES");
 		this.currTime += dt;
 		if(this.currTime >= this.duration) {
 			this.segments.push(this.currSegment);
@@ -114,15 +113,7 @@ Tongue.prototype.update = function(dt) {
 		}else{
 			this.meterLength -= 1;
 		}
-		/*
-		if(this.numSegments >= this.maxSegments) {
-			this.canExtend = false;
-			this.currTotalSegments = this.numSegments;
-			this.currTime = 0;
-		}
-		*/
 		if (this.meterLength <= 0) {
-			//debugger;
 			this.meterLength = this.meterMax;
 			this.canExtend = false;
 			this.currTotalSegments = this.numSegments;

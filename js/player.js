@@ -1,3 +1,4 @@
+"use strict";
 var Player = function(initX,initY,WIDTH,HEIGHT,strokeStyle,fillStyle,maxSpeed){
     this.width = WIDTH;
     this.height = HEIGHT;
@@ -77,13 +78,11 @@ Player.prototype.update = function(dt){
 		for(var i = 0;!colliding && i < collidables.length;i++) {
 			var manifold = collidables[i].collider.intersects(this.collider);
 			if(manifold && manifold.pen < -0.01) {
-				//debugger;
-				//console.log(manifold.pen);
 				var dir = 1;
 				if(manifold.originator != this.collider)
 					dir *= -1;
 				this.move(manifold.norm.mult(manifold.pen * dir));
-				if(manifold.norm.x * dir < 0.01 && manifold.norm.y * dir > 0) {
+				if(manifold.norm.x * dir * -1 < 0.01 && manifold.norm.y * dir > 0) {
 					this.movable.accel.y = 0;
 					this.movable.vel.y = 0;
 					this.jumping = false;
@@ -93,13 +92,21 @@ Player.prototype.update = function(dt){
 				colliding = true;
 			}
 		}
-        for(var i = 0;i < goals.length;i++) {
-			var manifold = goals[i].collider.intersects(this.collider);
-			if(manifold) {
-				state = GAME_STATE.FINISHED;
-				break;
-			}
-		}
+        if (canWin) {
+                for(var i = 0;i < goals.length;i++) {
+                var manifold = goals[i].collider.intersects(this.collider);
+                if(manifold) {
+                    state = GAME_STATE.FINISHED;
+                    break;
+                }
+            }
+        }
+
+        var manifold = key.collider.intersects(this.collider);
+		if (manifold) {
+            canWin = true;
+            soundEffect.play();
+        }
 	} while(colliding);
 	}
 	tongue.movable.pos = this.movable.pos;
@@ -125,20 +132,4 @@ Player.prototype.draw = function(){
     ctx.beginPath();
     ctx.fillRect(this.movable.pos.x - this.width / 2,this.movable.pos.y - this.height / 2
 	,this.width,this.height);
-	
-    
-	ctx.translate(this.movable.pos.x + this.width / 2,this.movable.pos.y + this.height / 2);
-	ctx.strokeStyle = 'cyan';
-	ctx.moveTo(0,0);
-	ctx.lineTo(this.movable.vel.x,this.movable.vel.y);
-	ctx.stroke();
-	
-	ctx.strokeStyle = '#f0f';
-	ctx.beginPath();
-	ctx.moveTo(0,0);
-	ctx.lineTo(this.movable.debug.x,this.movable.debug.y);
-	ctx.stroke();
-    ctx.closePath();
-    ctx.restore();
-    
 }

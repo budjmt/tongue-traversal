@@ -1,9 +1,12 @@
+"use strict";
+
 var canvas, ctx;
 var lastFrame, dt;
 var gamePaused;
 
 var player;
 var tongue;
+var key;
 var hud;
 
 var textures = Object.seal({
@@ -23,10 +26,13 @@ var GAME_STATE = Object.freeze({
 });
 
 var state;
+var canWin;
 var animFrame;
 var image;
+var spriteSheet;
 
 var exhaust;
+var soundEffect;
 
 window.onblur = function(){
 	gamePaused = true;
@@ -43,10 +49,13 @@ window.onfocus = function(){
 window.onload = function() {
 	canvas = document.querySelector("canvas");
 	ctx = canvas.getContext('2d');
+	canWin = false;
+	
+	soundEffect = document.getElementById("keySound");
 	
 	lastFrame = +Date.now();
 	gamePaused = false;
-	
+
 	exhaust = new Emitter();
 	this.exhaust = new this.Emitter();
 	this.exhaust.numParticles = 1000;
@@ -56,65 +65,57 @@ window.onload = function() {
 	this.exhaust.createParticles({x:100,y:100});
 	
 	
-	image = new Image();
-	image.src = 'media/obstacleTile.png';
+	image = document.getElementById("obstacleImg");
+	spriteSheet = document.getElementById("keyImg");
 
-	image.onload = function(){
-		var pattern = ctx.createPattern(image,"no-repeat")
-		
-		state = GAME_STATE.BEGIN;
-		/*
-		for(var i = 0;i < 10;i++) {
-			var x = Math.random() * canvas.width / 3 + canvas.width / 3;
-			var y = Math.random() * canvas.width / 4 + canvas.height / 4;
-			var w = Math.random() * 100 + 30;
-			var h = Math.random() * 100 + 30;
-			grapples.push(new GrappleObject(x,y,w,h));
-		}*/
-		
-		var obstacleMap = ["O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O",
-						   "O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O",
-						   " "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ",
-						   " "," "," "," ","O"," ","O","O"," ","O","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ",
-						   " "," ","O"," ","O"," ","O","O"," "," ","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ",
-						   " "," ","O"," ","O"," ","O","O","O"," ","O","G"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ",
-						   " "," ","O"," ","O"," ","O","O"," "," ","O","O","O","O","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ",
-						   " "," ","O"," ","O"," ","O","O"," ","O","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ",
-						   " "," ","O"," ","O"," ","O","O"," "," "," "," "," "," "," "," "," "," "," ","G"," "," "," "," "," "," "," "," "," "," "," ",
-						   " "," ","O"," ","O"," ","O","O","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ",
-						   " "," ","O"," ","O"," "," ","G"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ",
-						   " "," ","O"," ","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","G"," "," "," ",
-						   " "," ","O"," ","O"," ","O","O","O","O"," "," "," ","G","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," ","G"," ",
-						   " "," ","O"," ","O"," ","O","O","O","O"," "," "," "," ","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ",
-						   " "," ","O"," ","O"," ","O","O","O","O"," "," "," "," ","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ",
-						   " "," ","O"," ","O"," ","O","O","O","O"," "," "," "," ","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ",
-						   " "," ","O"," ","O"," ","O","O","O","O"," "," "," "," ","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","E",
-						   " "," ","O"," ","O"," ","O","O","O","O"," "," "," "," ","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","E",
-						   " "," ","O"," "," "," ","O","O","O","O"," "," "," "," ","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","E",
-						   "O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O"
-						   ];
-		
-		var obstWidth = canvas.width/31;
-		var obstHeight = canvas.height/20;
-		for(var i = 0; i < 20; i++){
-			for(var k = 0; k < 31; k++){
-				//debugger;
-				if (obstacleMap[(i*31)+k] == "O") {
-					obstacles.push(new Environment(k*obstWidth,i*obstHeight,obstWidth,obstHeight,image));
-				}else if (obstacleMap[(i*31)+k] == "G") {
-					grapples.push(new GrappleObject(k * obstWidth, i * obstHeight, obstWidth, obstHeight))
-				}else if (obstacleMap[(i*31)+k] == "E") {
-					goals.push(new Goal(k * obstWidth, i * obstHeight, obstWidth, obstHeight));
-				}
+	var pattern = ctx.createPattern(image,"no-repeat")
+	
+	state = GAME_STATE.BEGIN;
+	
+	var obstacleMap = ["O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O",
+					   "O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O",
+					   "O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O",
+					   "O","G"," "," "," "," "," ","O","O","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","G","E",
+					   "O"," "," "," "," "," "," ","O","O"," "," ","O","O","O","K"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","E",
+					   "O"," "," ","O","O"," "," ","O","O"," ","O","O","O","O"," "," "," ","G"," "," "," "," "," "," "," "," "," "," "," "," ","E",
+					   "O"," "," ","O","O"," "," ","O","O"," "," ","O","O","O","G"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","E",
+					   "O"," "," ","O","O","G"," ","O","O","O"," ","O","O","O","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","O",
+					   "O"," ","G","O","O"," "," ","O","O"," "," ","O","O","O","O"," "," "," "," ","G"," "," "," "," "," "," "," "," "," "," ","O",
+					   "O"," "," ","O","O"," "," ","O","O"," ","O","O","O","O","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","O",
+					   "O"," "," ","O","O"," "," ","G"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","O",
+					   "O"," "," ","O","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","G"," "," ","O",
+					   "O"," "," ","O","O"," "," ","O","O","O"," "," "," ","G","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," ","G","O",
+					   "O"," "," ","O","O"," "," ","O","O","O"," "," "," "," ","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","O",
+					   "O"," "," ","O","O"," "," ","O","O","O"," "," "," "," ","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","O",
+					   "O"," "," ","O","O"," "," ","O","O","O"," "," "," "," ","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","O",
+					   "O"," "," ","O","O"," "," ","O","O","O"," "," "," "," ","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","O",
+					   "O"," "," ","O","O"," "," ","G"," "," "," "," "," "," ","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","O",
+					   "O"," "," ","O","O"," "," "," "," "," "," "," "," "," ","O"," "," "," "," "," "," "," "," "," "," "," "," "," "," "," ","O",
+					   "O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O","O"
+					   ];
+	
+	var obstWidth = canvas.width/31;
+	var obstHeight = canvas.height/20;
+	for(var i = 0; i < 20; i++){
+		for(var k = 0; k < 31; k++){
+			if (obstacleMap[(i*31)+k] == "O") {
+				obstacles.push(new Environment(k*obstWidth,i*obstHeight,obstWidth,obstHeight,image));
+			}else if (obstacleMap[(i*31)+k] == "G") {
+				grapples.push(new GrappleObject(k * obstWidth, i * obstHeight, obstWidth, obstHeight))
+			}else if (obstacleMap[(i*31)+k] == "E") {
+				goals.push(new Goal(k * obstWidth, i * obstHeight, obstWidth, obstHeight));
+			}else if (obstacleMap[(i*31)+k] == "K") {
+				key = new Key(k * obstWidth,i * obstHeight);
 			}
 		}
-		
-		player = new Player(20,canvas.height-100,20,20,"black","red",10000000000000000000);
-		tongue = new Tongue();
-		hud = new HUD("black","black");
-		update();
 	}
 	
+	player = new Player(20,canvas.height-100,20,20,"black","red",10000000000000000000);
+	tongue = new Tongue();
+	hud = new HUD("black","black");
+	
+	update();
+
 }
 
 function updateDeltaTime(){
@@ -143,7 +144,7 @@ function playing(){
 	ctx.globalAlpha = 0.7;
 
 	ctx.fillStyle = gradient;
-	ctx.fillRect(0,0,this.canvas.width,this.canvas.height);
+	ctx.fillRect(0,0,canvas.width,canvas.height);
 	ctx.restore();
 	
 	ctx.restore();
@@ -161,7 +162,9 @@ function playing(){
 		
 		goals[i].draw();
 	}
-	
+	if (!canWin) {
+		key.draw(ctx,dt);
+	}
 	hud.updateTongueMeter(tongue);
 	hud.draw();
 }
@@ -184,8 +187,18 @@ function startScreen(){
 	var textWidth = ctx.measureText("Click Anywhere to Begin").width;
 	ctx.fillText("Click Anywhere to Begin",canvas.width/2 - textWidth/2,canvas.height/2 + 80);
 	
+	ctx.font = "30px sans-serif";
+	ctx.fillStyle = "#CCC";
+	var textWidth = ctx.measureText("WASD/Arrow Keys to move player").width;
+	ctx.fillText("WASD/Arrow Keys to move player",canvas.width/2 - textWidth/2,canvas.height/2 + 160);
+	
+	ctx.font = "30px sans-serif";
+	ctx.fillStyle = "#CCC";
+	var textWidth = ctx.measureText("Click and move for tongue").width;
+	ctx.fillText("Click and move for tongue",canvas.width/2 - textWidth/2,canvas.height/2 + 200);
+	
 	ctx.font = "20px sans-serif";
-	ctx.fillStyle = "rgb(200,200,200)";
+	ctx.fillStyle = "rgb(220,220,220)";
 	var textWidth = ctx.measureText("Created By: Michael Cohen and John Park").width;
 	ctx.fillText("Created By: Michael Cohen and John Park",20,canvas.height - 20);
 	ctx.restore();

@@ -10,8 +10,9 @@
 			left: 5px;
 			z-index:0;
 		}
-		
-
+		img{
+			display: none;
+		}
 	</style>
 	<title>Tounge-Traversal</title>
 </head>
@@ -20,7 +21,9 @@
 		Get a real browser!
 	</canvas>
 	<audio id="audio" src="media/battleToadsIsNowPaused.mp3" autoplay loop></audio>
-	
+	<audio id="keySound" src="media/getKey.mp3"></audio>
+	<img id="obstacleImg" src="media/obstacleTile.png"></img>
+	<img id="keyImg" src="media/spritesheet.png"></img>
 	
 	<script src='js/vector.js'></script>
 	<script src='js/boundingBox.js'></script>
@@ -32,6 +35,7 @@
 	<script src='js/enemy.js'></script>
 	<script src='js/player.js'></script>
 	<script src='js/tongue.js'></script>
+	<script src='js/key.js'></script>
 	<script src='js/hud.js'></script>
 	<script src='js/goal.js'></script>
 	<script src='js/emitter.js'></script>
