@@ -4,6 +4,7 @@ var gamePaused;
 
 var player;
 var tongue;
+var key;
 var hud;
 
 var textures = Object.seal({
@@ -27,6 +28,7 @@ var state;
 var animFrame;
 
 var image;
+var spriteSheet;
 
 window.onblur = function(){
 	gamePaused = true;
@@ -50,7 +52,11 @@ window.onload = function() {
 	
 	image = new Image();
 	image.src = 'media/obstacleTile.png';
-
+	
+	
+	spriteSheet = new Image();
+	spriteSheet.src = 'media/spritesheet.png';
+	
 	image.onload = function(){
 		var pattern = ctx.createPattern(image,"no-repeat")
 		
@@ -104,6 +110,7 @@ window.onload = function() {
 		player = new Player(20,canvas.height-100,20,20,"black","red",10000000000000000000);
 		tongue = new Tongue();
 		hud = new HUD("black","black");
+		key = new Key(400,400);
 		update();
 	}
 	
@@ -153,6 +160,8 @@ function playing(){
 		
 		goals[i].draw();
 	}
+	
+	key.draw(ctx, dt);
 	
 	hud.updateTongueMeter(tongue);
 	hud.draw();

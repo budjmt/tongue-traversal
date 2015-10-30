@@ -57,7 +57,7 @@ addEventListener("mousedown",function(e) {
 		mouse.y = e.pageY - e.target.offsetTop;
 		tongue.extending = true;
 		tongue.currSegment = new Segment(0,0,1);
-		tongue.currSegment.start = tongue.movable.pos.add(new Vector(player.width / 2, player.height / 2));
+		tongue.currSegment.start = tongue.movable.pos;
 		tongue.mouse = mouse;
 		//tongue.currSegment.end = tongue.currSegment.start.copy();
 		tongue.currSegment.end = tongue.mouse;
@@ -74,6 +74,15 @@ addEventListener("mousedown",function(e) {
 				if(grapples[i].collider.pointInside(cast.x,cast.y)) {
 					tongue.canExtend = false;
 					tongue.retracting = true;
+					tongue.currSegment.end = cast;
+					tongue.segments.push(tongue.currSegment);
+					tongue.numSegments++;
+					collided = true;
+				}
+			}
+			for(var i = 0;!collided && i < obstacles.length;i++) {
+				if(obstacles[i].collider.pointInside(cast.x,cast.y)) {
+					tongue.canExtend = false;
 					tongue.currSegment.end = cast;
 					tongue.segments.push(tongue.currSegment);
 					tongue.numSegments++;
