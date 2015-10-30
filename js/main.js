@@ -5,10 +5,6 @@ var gamePaused;
 var player;
 var tongue;
 var hud;
-var emitter;
-
-var pulsar;
-var exhaust;
 
 var textures = Object.seal({
 	obstacle: new Image(),
@@ -30,6 +26,8 @@ var state;
 var animFrame;
 var image;
 
+var exhaust;
+
 window.onblur = function(){
 	gamePaused = true;
 	window.cancelAnimationFrame(animFrame);
@@ -48,17 +46,19 @@ window.onload = function() {
 	
 	lastFrame = +Date.now();
 	gamePaused = false;
-
+	
+	exhaust = new Emitter();
+	this.exhaust = new this.Emitter();
+	this.exhaust.numParticles = 1000;
+	this.exhaust.red = 150;
+	this.exhaust.green = 150;
+	this.exhaust.blue = 150;
+	this.exhaust.createParticles({x:100,y:100});
+	
 	
 	image = new Image();
 	image.src = 'media/obstacleTile.png';
 
-	exhaust = new Emitter();
-	exhaust.numParticles = 100;
-	exhaust.red = 255;
-	exhaust.green = 150;
-	exhaust.createParticles({x:100,y:100});
-	
 	image.onload = function(){
 		var pattern = ctx.createPattern(image,"no-repeat")
 		
@@ -98,7 +98,8 @@ window.onload = function() {
 		var obstHeight = canvas.height/20;
 		for(var i = 0; i < 20; i++){
 			for(var k = 0; k < 31; k++){
-				if (obstacleMap[(i*31)+k] == "O"){ 
+				//debugger;
+				if (obstacleMap[(i*31)+k] == "O") {
 					obstacles.push(new Environment(k*obstWidth,i*obstHeight,obstWidth,obstHeight,image));
 				}else if (obstacleMap[(i*31)+k] == "G") {
 					grapples.push(new GrappleObject(k * obstWidth, i * obstHeight, obstWidth, obstHeight))
@@ -111,8 +112,6 @@ window.onload = function() {
 		player = new Player(20,canvas.height-100,20,20,"black","red",10000000000000000000);
 		tongue = new Tongue();
 		hud = new HUD("black","black");
-
-		
 		update();
 	}
 	
@@ -229,7 +228,10 @@ function update() {
 	}else if (state == GAME_STATE.FINISHED) {
 		finished();
 	}
-	exhaust.updateAndDraw(ctx,{x:100,y:100});
+	if (!tongue.canExtend && tongue.retracting) {
+		exhaust.updateAndDraw(ctx,{x:player.movable.pos.x,y:player.movable.pos.y})
+	}
+	
 }
 
 //helper functions

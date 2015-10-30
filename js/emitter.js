@@ -18,7 +18,7 @@
 		this.startRadius = 4;
 		this.expansionRate = 0.3
 		this.decayRate = 2.5;
-		this.lifetime = 100;
+		this.lifetime = 25;
 		this.red = 0;
 		this.green = 0;
 		this.blue = 0;

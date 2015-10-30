@@ -76,12 +76,20 @@ Tongue.prototype.reverseTongue = function() {
 
 Tongue.prototype.update = function(dt) {
 	if(this.canExtend && this.numSegments > 0) {
-		this.segments[0].start = player.movable.pos.add(new Vector(player.width / 2, player.height / 2));
+		this.segments[0].start = player.movable.pos;
 		for(var i = 0;i < grapples.length;i++) {
 			if(grapples[i].collider.pointInside(this.currSegment.end.x,this.currSegment.end.y)) {
 				this.canExtend = false;
 				this.retracting = true;
 				break;
+			}
+		}
+		if(!this.retracting) {
+			for(var i = 0;i < obstacles.length;i++) {
+				if(obstacles[i].collider.pointInside(this.currSegment.end.x,this.currSegment.end.y)) {
+					this.canExtend = false;
+					break;
+				}
 			}
 		}
 	}
@@ -93,7 +101,7 @@ Tongue.prototype.update = function(dt) {
 	}
 	else if(this.extending) {
 		//console.log("YES");
-		this.currTime += dt
+		this.currTime += dt;
 		if(this.currTime >= this.duration) {
 			this.segments.push(this.currSegment);
 			this.numSegments++;
